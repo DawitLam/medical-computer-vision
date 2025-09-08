@@ -1,5 +1,7 @@
 # Development assistant files (not for public repository)
 .github/development-instructions.md
+.github/instructions.md
+monitor_ai_activity.py
 
 # Python cache files
 __pycache__/
