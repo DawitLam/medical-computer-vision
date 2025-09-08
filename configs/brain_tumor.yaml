@@ -1,0 +1,65 @@
+# Brain Tumor Classification Configuration
+
+# Dataset settings
+dataset:
+  name: "brain-tumor"
+  kaggle_dataset: "sartajbhuvaji/brain-tumor-classification-mri"
+  classes: ["glioma", "meningioma", "notumor", "pituitary"]
+  num_classes: 4
+  
+# Data preprocessing
+preprocessing:
+  image_size: [256, 256]
+  normalize: true
+  skull_stripping: true
+  bias_correction: true
+  augmentation:
+    enabled: true
+    rotation_range: 25
+    width_shift_range: 0.1
+    height_shift_range: 0.1
+    horizontal_flip: true
+    vertical_flip: false
+    zoom_range: 0.2
+    brightness_range: [0.8, 1.2]
+    elastic_transform: true
+
+# Model configuration
+model:
+  type: "attention_cnn"
+  input_shape: [256, 256, 3]
+  dropout_rate: 0.5
+  use_3d: false  # Set to true for volumetric data
+  
+# Training settings
+training:
+  batch_size: 24
+  epochs: 75
+  learning_rate: 0.001
+  validation_split: 0.2
+  stratified_split: true
+  early_stopping:
+    enabled: true
+    patience: 12
+    restore_best_weights: true
+  reduce_lr:
+    enabled: true
+    patience: 6
+    factor: 0.4
+    min_lr: 0.00001
+
+# Data paths
+paths:
+  raw_data: "data/raw/brain-tumor"
+  processed_data: "data/processed/brain-tumor"
+  model_save: "models/brain_tumor_model.h5"
+  logs: "results/brain_tumor/logs"
+  
+# Evaluation
+evaluation:
+  metrics: ["accuracy", "precision", "recall", "f1", "auc"]
+  per_class_metrics: true
+  confusion_matrix: true
+  roc_curve: true
+  grad_cam: true
+  brain_region_analysis: true

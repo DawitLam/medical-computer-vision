@@ -1,0 +1,66 @@
+# Lung Cancer Detection Configuration
+
+# Dataset settings
+dataset:
+  name: "lung-cancer"
+  kaggle_dataset: "mohamedhanyyy/chest-ctscan-images"
+  classes: ["Normal", "Adenocarcinoma", "Large cell carcinoma", "Squamous cell carcinoma"]
+  num_classes: 4
+  
+# Data preprocessing
+preprocessing:
+  image_size: [224, 224]
+  normalize: true
+  hu_window:
+    level: -600
+    width: 1600
+  augmentation:
+    enabled: true
+    rotation_range: 20
+    width_shift_range: 0.15
+    height_shift_range: 0.15
+    horizontal_flip: true
+    vertical_flip: false
+    zoom_range: 0.15
+    brightness_range: [0.7, 1.3]
+    contrast_range: [0.8, 1.2]
+
+# Model configuration
+model:
+  type: "transfer_densenet121"
+  input_shape: [224, 224, 3]
+  dropout_rate: 0.6
+  freeze_base: true
+  
+# Training settings
+training:
+  batch_size: 16
+  epochs: 100
+  learning_rate: 0.0005
+  validation_split: 0.25
+  class_weight: "balanced"
+  early_stopping:
+    enabled: true
+    patience: 15
+    restore_best_weights: true
+  reduce_lr:
+    enabled: true
+    patience: 7
+    factor: 0.3
+    min_lr: 0.000001
+
+# Data paths
+paths:
+  raw_data: "data/raw/lung-cancer"
+  processed_data: "data/processed/lung-cancer"
+  model_save: "models/lung_cancer_model.h5"
+  logs: "results/lung_cancer/logs"
+  
+# Evaluation
+evaluation:
+  metrics: ["accuracy", "precision", "recall", "f1", "auc"]
+  per_class_metrics: true
+  confusion_matrix: true
+  roc_curve: true
+  grad_cam: true
+  test_time_augmentation: true

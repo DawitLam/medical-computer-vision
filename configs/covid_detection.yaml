@@ -1,0 +1,61 @@
+# COVID-19 CT Scan Classification Configuration
+
+# Dataset settings
+dataset:
+  name: "covid19-ct"
+  kaggle_dataset: "maedemaftouni/large-covid19-ct-slice-dataset"
+  classes: ["Normal", "COVID-19"]
+  num_classes: 2
+  
+# Data preprocessing
+preprocessing:
+  image_size: [224, 224]
+  normalize: true
+  hu_window:
+    level: 40
+    width: 400
+  augmentation:
+    enabled: true
+    rotation_range: 15
+    width_shift_range: 0.1
+    height_shift_range: 0.1
+    horizontal_flip: true
+    zoom_range: 0.1
+    brightness_range: [0.8, 1.2]
+
+# Model configuration
+model:
+  type: "transfer_resnet50"  # Options: basic_cnn, residual_cnn, attention_cnn, transfer_resnet50, etc.
+  input_shape: [224, 224, 3]
+  dropout_rate: 0.5
+  freeze_base: true
+  
+# Training settings
+training:
+  batch_size: 32
+  epochs: 50
+  learning_rate: 0.001
+  validation_split: 0.2
+  early_stopping:
+    enabled: true
+    patience: 10
+    restore_best_weights: true
+  reduce_lr:
+    enabled: true
+    patience: 5
+    factor: 0.5
+    min_lr: 0.00001
+
+# Data paths
+paths:
+  raw_data: "data/raw/covid19-ct"
+  processed_data: "data/processed/covid19-ct"
+  model_save: "models/covid19_model.h5"
+  logs: "results/covid19/logs"
+  
+# Evaluation
+evaluation:
+  metrics: ["accuracy", "precision", "recall", "f1", "auc"]
+  confusion_matrix: true
+  roc_curve: true
+  grad_cam: true
