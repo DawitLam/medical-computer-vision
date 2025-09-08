@@ -1,5 +1,5 @@
-# Copilot-specific files (not for public repository)
-.github/copilot-instructions.md
+# Development assistant files (not for public repository)
+.github/development-instructions.md
 
 # Python cache files
 __pycache__/

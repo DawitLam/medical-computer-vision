@@ -2,7 +2,7 @@
 
 ## Setting Up Your Git Identity
 
-To ensure all commits appear as your own work (not attributed to Copilot or any AI assistant), run these commands:
+To ensure all commits appear as your own work, run these commands:
 
 ```bash
 # Set your name
