@@ -10,8 +10,17 @@ import zipfile
 import argparse
 from pathlib import Path
 from typing import Optional
-import kaggle
-from kaggle.api.kaggle_api_extended import KaggleApi
+
+# Optional Kaggle import (requires authentication)
+try:
+    import kaggle
+    from kaggle.api.kaggle_api_extended import KaggleApi
+    KAGGLE_AVAILABLE = True
+except (ImportError, OSError) as e:
+    KAGGLE_AVAILABLE = False
+    print(f"ℹ️  Kaggle API not available: {e}")
+    print("   Install kaggle and set up credentials to use Kaggle datasets")
+    print("   Project can still work with online streaming and synthetic data")
 
 
 class KaggleDatasetDownloader:
@@ -27,9 +36,14 @@ class KaggleDatasetDownloader:
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
         
-        # Initialize Kaggle API
-        self.api = KaggleApi()
-        self.api.authenticate()
+        # Initialize Kaggle API only if available
+        if KAGGLE_AVAILABLE:
+            self.api = KaggleApi()
+            self.api.authenticate()
+        else:
+            self.api = None
+            print("⚠️ Kaggle API not available - dataset downloads disabled")
+            print("   Use online streaming or synthetic data instead")
         
         # Available datasets
         self.datasets = {
@@ -61,6 +75,9 @@ class KaggleDatasetDownloader:
         Returns:
             Path to the downloaded dataset directory
         """
+        if not KAGGLE_AVAILABLE or self.api is None:
+            raise RuntimeError("Kaggle API not available. Use online streaming instead.")
+            
         if dataset_key not in self.datasets:
             raise ValueError(f"Dataset '{dataset_key}' not found. Available: {list(self.datasets.keys())}")
         
