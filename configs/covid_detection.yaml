@@ -3,6 +3,7 @@
 # Dataset settings
 dataset:
   name: "covid19-ct"
+  online_name: "covid_xray_sample" # Use this for online streaming
   kaggle_dataset: "maedemaftouni/large-covid19-ct-slice-dataset"
   classes: ["Normal", "COVID-19"]
   num_classes: 2

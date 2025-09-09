@@ -31,7 +31,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 sys.path.append(str(Path(__file__).parent.parent))
 
 from models.cnn_models import create_model
-from data.preprocessing import MedicalImagePreprocessor
+from data.online_loader import OnlineMedicalDataLoader
 
 
 class MedicalTrainer:
@@ -79,36 +79,39 @@ class MedicalTrainer:
     
     def load_and_prepare_data(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
-        Load and prepare training data.
-        
-        Returns:
-            Tuple of (X_train, X_val, y_train, y_val)
+        Load and prepare training data using the online loader.
+        This method streams data and is ideal for cloud environments like Colab.
         """
-        print("📁 Loading and preparing data...")
+        print("📁 Loading and preparing data from online sources...")
         
-        data_path = Path(self.config['paths']['processed_data'])
-        if not data_path.exists():
-            print(f"❌ Processed data not found at {data_path}")
-            print("Run preprocessing first: python src/data/preprocessing.py")
+        loader = OnlineMedicalDataLoader()
+        
+        # Determine which dataset to stream from the config
+        dataset_name = self.config['dataset'].get('online_name', 'medical_demo')
+        print(f"🌐 Streaming dataset: {dataset_name}")
+
+        # Stream and preprocess data
+        X, y = [], []
+        for img_array, label_idx in loader.create_online_data_pipeline(
+            dataset_name=dataset_name,
+            target_size=tuple(self.config['model']['input_shape'][:2])
+        ):
+            X.append(img_array)
+            y.append(label_idx)
+
+        if not X:
+            print("❌ No data was loaded. Check online access or synthetic data generation.")
             sys.exit(1)
-        
-        # This is a placeholder - implement actual data loading
-        # based on your dataset structure
-        print("⚠️  Implement actual data loading in load_and_prepare_data()")
-        
-        # For now, create dummy data for testing
-        img_size = self.config['preprocessing']['image_size']
-        n_samples = 100  # Small for testing
-        
-        X = np.random.random((n_samples, img_size[0], img_size[1], 3)).astype(np.float32)
-        y = np.random.randint(0, self.config['dataset']['num_classes'], n_samples)
-        
+            
+        X = np.array(X)
+        y = np.array(y)
+
         # Split data
         X_train, X_val, y_train, y_val = train_test_split(
             X, y, 
             test_size=self.config['training']['validation_split'],
             random_state=42,
-            stratify=y
+            stratify=y if len(np.unique(y)) > 1 else None
         )
         
         print(f"✓ Training samples: {len(X_train)}")
